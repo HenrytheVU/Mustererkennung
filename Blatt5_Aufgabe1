@@ -1,0 +1,55 @@
+% Übungsblatt 5 Aufgabe 1
+
+function outputImg = linearFilter(I, g)
+
+rows = size(I, 1);
+cols = size(I, 2);
+
+g1=ones(3,3)/9;
+g3=[1 2 1; 2 4 2; 1 2 1]/16;
+gsx=[1 0 -1; 2 0 -2; 1 0 -1];
+gsy=[1 2 1; 0 0 0; -1 -2 -1];
+
+if(strcmp(g,'g1'))
+    g=g1;
+elseif(strcmp(g,'g3'))
+    g=g3;
+elseif(strcmp(g,'gsx'))
+    g=gsx;
+elseif(strcmp(g,'gsy'))
+    g=gsy;
+else
+    msg = 'Invalid filter! Only accept g1, g3, gsx, gsy!';
+    error(msg);
+end
+% Cast image values to double
+Id = double(I);
+
+    for i=1:rows
+        for j=1:cols
+
+            kernel = [getValue(Id, i-1, j-1) getValue(Id, i-1,j) getValue(Id, i-1,j+1);
+                       getValue(Id, i,j-1) getValue(Id, i,j) getValue(Id, i,j+1);
+                       getValue(Id, i+1, j-1) getValue(Id, i+1, j) getValue(Id, i+1, j+1)];
+
+             center = calculateCenter(kernel, g);
+            
+            outputImg(i,j) = uint8(center);
+        end
+    end
+end
+
+function center = calculateCenter(A, B)
+center = (A(1,1)*B(1,1)+A(1,2)*B(1,2)+A(1,3)*B(1,3)+A(2,1)*B(2,1)+A(2,2)*B(2,2)+A(2,3)*B(2,3)+A(3,1)*B(3,1)+A(3,2)*B(3,2)+A(3,3)*B(3,3));
+end
+
+function val = getValue(I, i, j)
+rows = size(I, 1);
+cols = size(I, 2);
+    if(i == 0 || i > rows || j == 0 || j > cols)
+        val = 0;
+    else
+        val = I(i, j);
+    end
+end
+
